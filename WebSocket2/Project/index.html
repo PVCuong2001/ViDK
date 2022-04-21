@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="" />
+	<meta name="author" content="" />
+	<title>Dashboard - SB Admin</title>
+	<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+	<link href="css/styles.css" rel="stylesheet" />
+	<script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+	<script>
+		window.onload = function () {
+
+			var dps = []; // dataPoints
+			var chart = new CanvasJS.Chart("chartContainer", {
+				title: {
+					text: "Tempurate"
+				},
+				data: [{
+					type: "line",
+					dataPoints: dps
+				}]
+			});
+			var chart1 = new CanvasJS.Chart("chartContainer1", {
+				title: {
+					text: "HUMIDITY"
+				},
+				data: [{
+					type: "line",
+					dataPoints: dps
+				}]
+			});
+
+			var xVal = 0;
+			var yVal = 100;
+			var updateInterval = 1000;
+			var dataLength = 20; // number of dataPoints visible at any point
+
+			var updateChart = function (count) {
+
+				count = count || 1;
+
+				for (var j = 0; j < count; j++) {
+					yVal = yVal + Math.round(5 + Math.random() * (-5 - 5));
+					dps.push({
+						x: xVal,
+						y: yVal
+					});
+					xVal++;
+				}
+
+				if (dps.length > dataLength) {
+					dps.shift();
+				}
+
+				chart.render();
+				chart1.render();
+			};
+
+			updateChart(dataLength);
+			setInterval(function () { updateChart() }, updateInterval);
+
+		}
+	</script>
+</head>
+
+<body>
+
+
+
+	<div id="layoutSidenav_content">
+		<main>
+			<div style="justify-content: center;">
+				<br>
+				<br>
+			</div>
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-xl-6 col-md-6">
+						<div class="card text-white mb-4" style="background-color: orange;">
+							<div class="card-body">TEMPERATURE </div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<div class="small text-white stretched-link" style="font-size: 75px;">100C</div>
+								<!-- <div class="small text-white"><i class="fas fa-angle-right"></i></div> -->
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-6 col-md-6">
+						<div class="card text-white mb-4" style="background-color: aqua;">
+							<div class="card-body">HUMIDITY</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<div class="small text-white stretched-link" style="font-size: 75px;">40%</div>
+								<!-- <div class="small text-white"><i class="fas fa-angle-right"></i></div> -->
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xl-6">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="fas fa-chart-area me-1"></i>
+									Temperature Char
+								</div>
+								<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+								<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+							</div>
+						</div>
+						<div class="col-xl-6">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="fas fa-chart-bar me-1"></i>
+									Hudimity Char
+								</div>
+								<div id="chartContainer1" style="height: 300px; width: 100%;"></div>
+								<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+							</div>
+						</div>
+					</div>
+					<!-- <div class="col-xl-3 col-md-6">
+						<div class="card bg-success text-white mb-4">
+							<div class="card-body">Success Card</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<a class="small text-white stretched-link" href="#">View Details</a>
+								<div class="small text-white"><i class="fas fa-angle-right"></i></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-3 col-md-6">
+						<div class="card bg-danger text-white mb-4">
+							<div class="card-body">Danger Card</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<a class="small text-white stretched-link" href="#">View Details</a>
+								<div class="small text-white"><i class="fas fa-angle-right"></i></div>
+							</div>
+						</div>
+					</div> -->
+				</div>
+			</div>
+
+		</main>
+	</div>
+
+
+	<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+
+</html>

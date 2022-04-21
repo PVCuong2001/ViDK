@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../RiderProjects/RaspiDotNetIoT-main"
+		},
+		{
+			"name": "Demo_ESP8266",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}

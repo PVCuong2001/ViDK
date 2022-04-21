@@ -1,0 +1,289 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="" />
+	<meta name="author" content="" />
+	<title>Dashboard</title>
+	<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+	<link href="css/styles.css" rel="stylesheet" />
+	<script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+	<script>
+		window.onload = function () {
+			var speed0 = document.getElementById('speed0');
+			var speed1 = document.getElementById('speed1');
+			var speed2 = document.getElementById('speed2');
+			var speed3 = document.getElementById('speed3');
+			var auto_off = document.getElementById('auto_off');
+			var auto_on = document.getElementById('auto_on');
+			var SetT3 = document.getElementById('SetT3');
+			var SetT2 = document.getElementById('SetT2');
+			var SetT1 = document.getElementById('SetT1');
+
+			//initiate data with empty
+			var dataTemp = []; // data temperature
+			var dataHud = []; //data hudimity
+			//set amount of points will display
+			var dataLength = 20;
+
+			var url = window.location.host; // hàm trả về url của trang hiện tại kèm theo port
+			var ws = new WebSocket('ws://' + url + '/ws'); // mở 1 websocket với port 8000
+			console.log('connecting...')
+			ws.onopen = function () //khi websocket được mở thì hàm này sẽ được thưc hiện
+			{
+
+
+				console.log('connected...')
+			};
+			ws.onmessage = function (evt) // sự kiện xảy ra khi client nhận dữ liệu từ server
+			{
+
+				arr = evt.data.split(" ")
+				console.log(arr[0] + " " + arr[1])
+				var current = new Date();
+				updateChart(dataLength, arr[0], arr[1], Date.now())
+
+			};
+			ws.onclose = function () { // hàm này sẽ được thực hiện khi đóng websocket
+
+			};
+			speed0.onclick = function () {
+				console.log("speed0")
+				ws.send("Speed0")
+			}
+			speed1.onclick = function () {
+				console.log("speed1")
+				ws.send("Speed1")
+			}
+			speed2.onclick = function () {
+				console.log("speed2")
+				ws.send("Speed2")
+			}
+			speed3.onclick = function () {
+				console.log("speed3")
+				ws.send("Speed3")
+			}
+			SetT1.onclick = function () {
+				console.log("speed3")
+				ws.send("SetT1=25")
+			}
+			SetT2.onclick = function () {
+				console.log("speed3")
+				ws.send("SetT2=26")
+			}
+			SetT3.onclick = function () {
+				console.log("speed3")
+				ws.send("SetT3=29")
+			}
+			auto_off.onclick = function () {
+				console.log("auto_off")
+				ws.send("AutoOff")
+			}
+			auto_on.onclick = function () {
+				console.log("auto_on")
+				ws.send("AutoOn")
+			}
+			// led.onchange = function () { // thực hiện thay đổi bật/tắt led
+			// 	// var led_status = 'LED_OFF';
+			// 	// if (led.checked) {
+			// 	// 	led_status = 'LED_ON';
+			// 	// }
+			// 	// ws.send(led_status)
+			// }
+
+
+			//get element in card
+			var elementTemp = document.querySelector("#valueTempurature");
+			var elementHud = document.querySelector("#valueHudimity");
+
+
+
+
+			//
+			var xVal = dataLength;
+			var yVal = 0;
+			// initiate data for data temperature and hudimity
+			var initialData = function (lengthData) {
+				for (var i = 0; i < lengthData; i++) {
+					dataTemp.push({
+						x: Date.now(),
+						y: 0
+					});
+					dataHud.push({
+						x: Date.now(),
+						y: 0
+					});
+				}
+			}
+			initialData(dataLength);
+
+
+			//initiate chart temperature and hudimity	
+			var chartTemperature = new CanvasJS.Chart("chartContainerTemperature", {
+				title: {
+					text: "TEMPERATURE (C)",
+					fontColor: "red"
+				},
+				data: [{
+					type: "line",
+					lineColor: "orange",
+					lineThickness: 4,
+					dataPoints: dataTemp,
+					xValueType: "dateTime",
+					xValueFormatString: "DD MMM hh:mm TT",
+				}]
+			});
+			var chartHudimity = new CanvasJS.Chart("chartContainerHudimity", {
+				title: {
+					text: "HUMIDITY (%)",
+					fontColor: "green"
+				},
+				data: [{
+					type: "line",
+					lineColor: "aqua",
+					lineThickness: 4,
+					dataPoints: dataHud,
+					xValueType: "dateTime",
+					xValueFormatString: "DD MMM hh:mm TT",
+				}]
+			});
+
+
+			//function render chart
+			var renderChart = function () {
+				chartHudimity.render();
+				chartTemperature.render();
+			}
+
+
+			//start render chart with initial data
+			renderChart();
+
+			//set time loop = 1s
+			var updateInterval = 2000;
+
+
+			//update chart
+			var updateChart = function (dataLength, valueTemp, valueHump, mytime) {
+
+				console.log(mytime);
+
+				//set value tempurature and hudimity at here, which value you get from server
+				var max = 20, min = 10;
+				yValueTemp = parseFloat(parseFloat(valueTemp).toFixed(2))
+				yValueHud = parseFloat(parseFloat(valueHump).toFixed(2))
+				console.log(typeof (yValueHud))
+
+				//show value in card
+				elementHud.innerHTML = yValueHud;
+				elementTemp.innerHTML = yValueTemp;
+
+
+				//push new value into each array 
+				xVal++;
+				dataHud.push({
+					x: mytime,
+					y: yValueHud
+				});
+
+				dataTemp.push({
+					x: mytime,
+					y: yValueTemp
+				});
+
+
+				//remove first value in array
+				dataTemp.shift();
+				dataHud.shift();
+				// if (dataTemp.length > dataLength && dataHud.length > dataLength) {
+
+				// }
+				//render chart after update data
+				renderChart();
+			};
+
+
+			// function myFunction(button_num) {
+			// 	if (button_num == 1) {
+			// 		ws.send("Speed1")
+			// 	} else if (button_num == 1) {
+			// 		ws.send("Speed1")
+			// 	} else if (button_num == 3) {
+			// 		ws.send("Speed1")
+			// 	}
+			// }
+		}
+	</script>
+</head>
+
+<body>
+	<div> Control LED
+		<input type="button" id="speed0" />
+		<input type="button" id="speed1" />
+		<input type="button" id="speed2" />
+		<input type="button" id="speed3" />
+		<input type="button" id="auto_on" />
+		<input type="button" id="auto_off" />
+		<input type="button" id="SetT1" />
+		<input type="button" id="SetT2" />
+		<input type="button" id="SetT3" />
+	</div>
+	<div id="layoutSidenav_content">
+		<main>
+			<div style="justify-content: center;">
+				<br>
+				<br>
+			</div>
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-xl-6 col-md-6">
+						<div class="card text-white mb-4" style="background-color: orange;">
+							<div class="card-body">TEMPERATURE (C) </div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<div class="small text-white stretched-link" style="font-size: 75px;"
+									id="valueTempurature">0</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-6 col-md-6">
+						<div class="card text-white mb-4" style="background-color: aqua;">
+							<div class="card-body">HUMIDITY (%)</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<div class="small text-white stretched-link" style="font-size: 75px;"
+									id="valueHudimity">0</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xl-6">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="fas fa-chart-area me-1"></i>
+									Temperature Char
+								</div>
+								<div id="chartContainerTemperature" style="height: 300px; width: 100%;"></div>
+								<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+							</div>
+						</div>
+						<div class="col-xl-6">
+							<div class="card mb-4">
+								<div class="card-header">
+									<i class="fas fa-chart-bar me-1"></i>
+									Hudimity Char
+								</div>
+								<div id="chartContainerHudimity" style="height: 300px; width: 100%;"></div>
+								<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</main>
+	</div>
+</body>
+
+</html>
