@@ -12918,6 +12918,9 @@
 			var checkbox = document.getElementById('checkBox');
 			var btnSend = document.getElementById('btn_send');
 			var txtThredshold = document.getElementById('txt_Thredshold');
+			var doorbox = document.getElementById('doorBox');
+			var T1 = 25, T2 = 28, T3 = 30;
+
 
 			//initiate data with empty
 			var dataTemp = []; // data temperature
@@ -12931,33 +12934,97 @@
 			ws.onopen = function () //khi websocket được mở thì hàm này sẽ được thưc hiện
 			{
 				console.log('connected...')
+				ws.send("Init")
+
 			};
+
 			ws.onmessage = function (evt) // sự kiện xảy ra khi client nhận dữ liệu từ server
 			{
-				arr = evt.data.split(" ")
-				console.log(arr[0] + " " + arr[1])
-				var current = new Date();
-				updateChart(dataLength, arr[0], arr[1], Date.now())
+				arr = evt.data.split(":")
+				label = arr[0]
+				switch (label) {
+					case "init":
+						init = arr[1].split(" ")
+						if (init[0] == "0") checkbox.checked = false
+						else {
+							checkbox.checked = true;
+							var e = document.getElementById("setChange");
+							e.style.display = "block";
+						}
+						T1 = parseInt(init[1]);
+						T2 = parseFloat(init[2]);
+						T3 = parseFloat(init[3]);
+						console.log(T1, T2, T3)
+						break;
+
+					case "temphum":
+						temphum = arr[1].split(" ")
+						console.log(temphum[0] + " " + temphum[1])
+						var current = new Date();
+						updateChart(dataLength, temphum[0], temphum[1], Date.now())
+						break;
+					case "auto":
+						if (arr[1] == "on") {
+							checkbox.checked = true;
+							var e = document.getElementById("setChange");
+							e.style.display = "block";
+						} else {
+							checkbox.checked = false;
+						}
+					case "T1":
+						T1 = parseInt(arr[1]);
+						break;
+					case "T2":
+						T2 = parseInt(arr[1]);
+						break;
+					case "T3":
+						T3 = parseInt(arr[1]);
+						break;
+					case "Speed0":
+						console.log("speed0")
+						break;
+					case "Speed1":
+						console.log("speed1")
+						break;
+					case "Speed2":
+						console.log("speed2")
+						break;
+					case "Speed3":
+						console.log("speed3")
+						break;
+					case "door":
+						if (arr[1] == "on") doorbox.checked = true;
+						else doorbox.checked = false;
+						break;
+
+
+
+				}
+
 
 			};
 			ws.onclose = function () { // hàm này sẽ được thực hiện khi đóng websocket
 
 			};
 			speed0.onclick = function () {
-				console.log("speed0")
+
 				ws.send("Speed0")
 			}
 			speed1.onclick = function () {
-				console.log("speed1")
 				ws.send("Speed1")
 			}
 			speed2.onclick = function () {
-				console.log("speed2")
 				ws.send("Speed2")
 			}
 			speed3.onclick = function () {
-				console.log("speed3")
 				ws.send("Speed3")
+			}
+			doorbox.onclick = function () {
+				if (doorbox.checked == true) {
+					ws.send("DoorOn");
+				} else {
+					ws.send("DoorOff");
+				}
 			}
 			checkbox.onclick = function () {
 				var checkBox = document.getElementById("checkBox");
@@ -13095,6 +13162,7 @@
 			};
 
 
+
 		}
 
 
@@ -13109,6 +13177,12 @@
 		<button type="button" class="btn btn-outline-primary btn-lg" id="speed1">1</button>
 		<button type="button" class="btn btn-outline-primary btn-lg" id="speed2">2</button>
 		<button type="button" class="btn btn-outline-primary btn-lg" id="speed3">3</button>
+		<div>
+			<label class="switch">
+				<input type="checkbox" id="doorBox" onclick="eventForSwitch()">
+				<span class="slider round"></span>
+			</label>
+		</div>
 
 		<div>
 			<h1>Set auto change: </h1>

@@ -4,7 +4,7 @@ var http = require('http');
 var WebSocket = require('ws');
 // function gửi yêu cầu(response) từ phía server hoặc nhận yêu cầu (request) của client gửi lên
 function requestHandler(request, response) {
-    fs.readFile('./index.html', function(error, content) {
+    fs.readFile('./index.html', function (error, content) {
         response.writeHead(200, {
             'Content-Type': 'text/html'
         });
@@ -26,13 +26,13 @@ function broadcast(socket, data) {
         }
     }
 }
-ws.on('connection', function(socket, req) {
+ws.on('connection', function (socket, req) {
     clients.push(socket);
-    socket.on('message', function(message) {
+    socket.on('message', function (message) {
         console.log('received: %s', message);
         broadcast(socket, message.toString());
     });
-    socket.on('close', function() {
+    socket.on('close', function () {
         var index = clients.indexOf(socket);
         clients.splice(index, 1);
         console.log('disconnected');
