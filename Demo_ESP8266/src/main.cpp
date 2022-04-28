@@ -3,14 +3,11 @@
 #include "DHT.h"
 #include <Adafruit_Sensor.h>
 #include <ESP8266WiFi.h>
-#include <Servo.h>
 #include <WebSocketsClient.h> //https://github.com/Links2004/arduinoWebSockets
 #include <string>
 using namespace std;
 #define DHTTYPE DHT11
-#define DHTPIN 15 // DHT 11
-const uint8_t servoPin = D2;
-Servo servo;
+#define DHTPIN D4 // DHT 11
 DHT dht(DHTPIN, DHTTYPE);
 float total_temp = 0;
 float total_hum = 0;
@@ -36,7 +33,6 @@ float T1 = 25;
 float T2 = 28;
 float T3 = 30;
 unsigned long timer = millis();
-bool checkDoor = false;
 unsigned long mytime = 0;
 void SpeedState(int status)
 {
@@ -172,7 +168,6 @@ void setup()
 {
 
     // pinMode(LED, OUTPUT);
-    servo.attach(servoPin);
     pinMode(D5, OUTPUT);
     // pinMode(2, OUTPUT);
     pinMode(D7, OUTPUT);
@@ -202,13 +197,6 @@ void loop()
     Serial1.println(h);
     Serial1.println(t);
 
-    // Check if any reads failed and exit early(to try again).if (isnan(h) || isnan(t))
-    // {
-    //     Serial.println("Failed to read from DHT sensor!");
-    //     return;
-    // }
-    // Compute heat index in Celsius (isFahreheit = false)
-    // float hic = dht.computeHeatIndex(t, h, false);
     total_temp += t;
     total_hum += h;
     mycount += 1;
